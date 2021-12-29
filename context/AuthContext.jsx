@@ -13,6 +13,7 @@ async function signup(email, password, displayName) {
         await createUserWithEmailAndPassword(auth, email, password).then(
             ({ user }) => {
                 if (!user) return
+                if (!displayName) return alert('no display name')
 
                 setDoc(doc(fs, 'users', user.uid), {
                     displayName: displayName,

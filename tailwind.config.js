@@ -7,7 +7,6 @@ module.exports = {
         extend: {
             colors: {
                 theme: '#2266ff',
-                test: 'var(--test)',
             },
         },
     },
