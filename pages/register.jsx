@@ -17,16 +17,23 @@ function InputField({ onChange, value, title, placeholder }) {
 }
 
 export default function Register() {
-    const { signup } = useAuth()
+    const { signup, currentUser } = useAuth()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [displayName, setDisplayName] = useState('')
     const [error, setError] = useState('')
     const router = useRouter()
 
+    useEffect(() => {
+        if (currentUser) router.replace('/')
+    }, [currentUser, router])
+
     return (
         <div className='h-screen'>
             <div className='shadow-lg rounded-md border border-gray-200 mx-auto my-[10vh] max-w-3xl h-[80vh] p-6'>
+                <h2 className='text-3xl font-bold text-theme mb-4'>
+                    Register to our chat app!☺️
+                </h2>
                 <InputField
                     title='Email'
                     value={email}

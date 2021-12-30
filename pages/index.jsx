@@ -12,11 +12,13 @@ import {
 } from 'firebase/firestore'
 import { useAuth } from '../context/AuthContext'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 export default function Home() {
-    const { currentUser, logout } = useAuth()
+    const { currentUser, fetchingUser, logout } = useAuth()
     const [chats, setChats] = useState([])
     const [loading, setLoading] = useState(true)
+    const router = useRouter()
 
     useEffect(() => {
         if (!currentUser) return
@@ -38,23 +40,31 @@ export default function Home() {
 
     async function addChat() {
         const name = prompt('Vad ska chaten heta?')
-        await addDoc(collection(fs, 'chats'), {
-            name,
-            participants: [currentUser.uid],
-        })
+        if (name) {
+            await addDoc(collection(fs, 'chats'), {
+                name,
+                participants: [currentUser.uid],
+            })
+        }
     }
 
     async function joinChat() {
         const id = prompt('Vad är chat id´t?')
-        try {
-            const docRef = doc(fs, 'chats', id)
-            await updateDoc(docRef, {
-                participants: arrayUnion(currentUser.uid),
-            })
-        } catch (error) {
-            alert('could not find room')
+        if (id) {
+            try {
+                const docRef = doc(fs, 'chats', id)
+                await updateDoc(docRef, {
+                    participants: arrayUnion(currentUser.uid),
+                })
+            } catch (error) {
+                alert('could not find room')
+            }
         }
     }
+
+    useEffect(() => {
+        if (!currentUser && !fetchingUser) router.replace('/register')
+    }, [currentUser, router, fetchingUser])
 
     return (
         <div className='h-screen'>

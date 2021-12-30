@@ -13,7 +13,7 @@ import { useAuth } from '../../context/AuthContext'
 import Message from '../../components/Message'
 import { useRouter } from 'next/router'
 export default function Home() {
-    const { signup, currentUser, logout } = useAuth()
+    const { currentUser, fetchingUser } = useAuth()
     const [message, setMessage] = useState('')
     const [messages, setMessages] = useState([])
 
@@ -30,11 +30,15 @@ export default function Home() {
                 setMessages(
                     snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
                 )
-                dummyRef.current.scrollIntoView({ behavior: 'smooth' })
+                dummyRef.current.scrollIntoView()
             }
         )
         return unsubscribe
     }, [router.query.chatId])
+
+    useEffect(() => {
+        if (!currentUser && !fetchingUser) router.replace('/register')
+    }, [currentUser, router, fetchingUser])
 
     async function handleSubmit(e) {
         e.preventDefault()
@@ -50,7 +54,13 @@ export default function Home() {
 
     return (
         <div className='h-screen flex flex-col overflow-hidden'>
-            <div className='flex flex-col items-start mx-3 my-1 h-full overflow-y-scroll'>
+            <div className='flex flex-col items-start mx-3 my-3 h-full overflow-y-scroll'>
+                {messages.length === 0 && (
+                    <h2 className='text-center w-full text-3xl text-gray-500/90'>
+                        Det finns inga medelanden i denna chat, var fört och
+                        skriv!
+                    </h2>
+                )}
                 {messages.map((message) => {
                     return <Message key={message.id} message={message} />
                 })}
@@ -59,7 +69,7 @@ export default function Home() {
             <div className='flex-shrink-0 border-t border-t-gray-200 pt-2'>
                 <form className='p-2 flex items-center' onSubmit={handleSubmit}>
                     <input
-                        className='rounded-md border w-full border-black py-1 px-2 outline-none focus-within:border-theme'
+                        className='rounded-xl border w-full border-black py-2 px-3 outline-none focus-within:border-theme'
                         type='text'
                         value={message}
                         placeholder='Type your message...'
