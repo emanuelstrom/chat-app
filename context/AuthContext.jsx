@@ -16,8 +16,8 @@ async function signup(email, password, displayName) {
                 if (!displayName) return alert('no display name')
 
                 setDoc(doc(fs, 'users', user.uid), {
-                    displayName: displayName,
-                    email: email,
+                    displayName,
+                    email,
                     userUID: user.uid,
                 })
             }
@@ -62,8 +62,10 @@ export const AuthProvider = ({ children }) => {
                 setFetchingUser(false)
                 return
             }
+
             setFetchingUser(true)
             const response = await getDoc(doc(fs, 'users', user.uid))
+            console.log('response: ', response)
             const data = { ...user, ...response.data() }
             setFetchingUser(false)
             setCurrentUser(data)
