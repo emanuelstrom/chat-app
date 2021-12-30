@@ -16,7 +16,7 @@ export default function Home() {
     const { currentUser, fetchingUser } = useAuth()
     const [message, setMessage] = useState('')
     const [messages, setMessages] = useState([])
-
+    const [chatRoom, setChatRoom] = useState({})
     const dummyRef = useRef(null)
     const router = useRouter()
 
@@ -33,6 +33,9 @@ export default function Home() {
                 dummyRef.current.scrollIntoView()
             }
         )
+        getDoc(doc(fs, 'chats', router.query.chatId)).then((doc) => {
+            setChatRoom(doc.data())
+        })
         return unsubscribe
     }, [router.query.chatId])
 
@@ -54,6 +57,9 @@ export default function Home() {
 
     return (
         <div className='h-screen flex flex-col overflow-hidden'>
+            <div className='flex-shrink-0 border-b border-b-gray-200 p-2'>
+                <h2 className='text-3xl font-extrabold'>{chatRoom.name}</h2>
+            </div>
             <div className='flex flex-col items-start mx-3 my-3 h-full overflow-y-scroll'>
                 {messages.length === 0 && (
                     <h2 className='text-center w-full text-3xl text-gray-500/90'>
